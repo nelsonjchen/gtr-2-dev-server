@@ -41,5 +41,6 @@ The dev server will offer a few endpoints to develop and test functionality. It 
 - `GET /setup.html` - Returns a simple web page that allows setting and unsetting cookies for testing.
 - `GET /download/test.txt` - Returns a simple text file for testing. The text file is a repeat of alphanumeric characters from `a` to `z` and `0` to `9` repeated 1000 times.
   - The endpoint will require cookies to be set to download the file. If it is not set, it will return a 302 redirect to `/`, similar to Google Takeout.
+  - Supports Range requests for partial content downloads.
 
 Those two endpoints will log a lot of information to the console to help with debugging and testing.
