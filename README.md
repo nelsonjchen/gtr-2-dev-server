@@ -44,3 +44,9 @@ The dev server will offer a few endpoints to develop and test functionality. It 
   - Supports Range requests for partial content downloads.
 
 Those two endpoints will log a lot of information to the console to help with debugging and testing.
+
+### Deployment
+
+Threw this out with `gcloud run deploy`.
+
+https://gtr-2-dev-server-262382012399.us-central1.run.app/
