@@ -47,6 +47,6 @@ Those two endpoints will log a lot of information to the console to help with de
 
 ### Deployment
 
-Threw this out with `gcloud run deploy`.
+Threw this out with `gcloud run deploy --source .`.
 
 https://gtr-2-dev-server-262382012399.us-central1.run.app/
