@@ -37,7 +37,7 @@ func downloadHandler(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("testcookie")
 	if err != nil || cookie.Value != "valid" {
 		log.Println("Redirecting due to missing/invalid cookie")
-		http.Redirect(w, r, "/", http.StatusFound)
+		http.Redirect(w, r, "/setup.html", http.StatusFound)
 		return
 	}
 

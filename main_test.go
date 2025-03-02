@@ -51,6 +51,11 @@ func TestDownloadHandler_NoCookie(t *testing.T) {
 	if resp.StatusCode != http.StatusFound {
 		t.Errorf("Expected redirect status 302, got %d", resp.StatusCode)
 	}
+
+	location := resp.Header.Get("Location")
+	if location != "/setup.html" {
+		t.Errorf("Expected redirect to /setup.html, got %s", location)
+	}
 }
 
 func TestDownloadHandler_FullDownload(t *testing.T) {
