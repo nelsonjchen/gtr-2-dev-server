@@ -10,12 +10,35 @@ import (
 
 const testContent = "abcdefghijklmnopqrstuvwxyz0123456789"
 
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Accessed /")
+	w.Header().Set("Content-Type", "text/html")
+	fmt.Fprint(w, `<html>
+<body>
+  <h1>Gargantuan Takeout Rocket 2 Dev Server</h1>
+  <p>This is a development and test server for the Gargantuan Takeout Rocket 2 project.</p>
+
+  <h2>Test Links:</h2>
+  <ul>
+    <li><a href="/setup.html">Cookie Setup Page</a> - Set up cookies for testing</li>
+    <li><a href="/download/test.txt">Download Test File</a> - Requires valid cookie to download</li>
+  </ul>
+
+  <h2>Resources:</h2>
+  <ul>
+    <li><a href="https://github.com/nelsonjchen/gtr-2-dev-server" target="_blank">GitHub Repository</a></li>
+  </ul>
+</body>
+</html>`)
+}
+
 func setupHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Accessed /setup.html")
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprint(w, `<html>
 <body>
   <h1>Cookie Setup</h1>
+  <p><a href="/">Home</a></p>
   <button onclick="setCookie()">Set Cookie</button>
   <button onclick="clearCookie()">Clear Cookie</button>
   <script>
@@ -118,6 +141,7 @@ func downloadHandler(w http.ResponseWriter, r *http.Request) {
 
 func setupHandlers() *http.ServeMux {
 	mux := http.NewServeMux()
+	mux.HandleFunc("/", indexHandler)
 	mux.HandleFunc("/setup.html", setupHandler)
 	mux.HandleFunc("/download/test.txt", downloadHandler)
 	return mux
