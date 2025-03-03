@@ -42,6 +42,9 @@ The dev server will offer a few endpoints to develop and test functionality. It 
 - `GET /download/test.txt` - Returns a simple text file for testing. The text file is a repeat of alphanumeric characters from `a` to `z` and `0` to `9` repeated 1000 times.
   - The endpoint will require a cookie named `testcookie` with value `valid` to download the file. If this cookie is not set or has an invalid value, it will return a 302 redirect to `/setup.html`, similar to Google Takeout.
   - Supports Range requests for partial content downloads.
+- `GET /download-no-cookie/test.txt` - Returns the same test file as `/download/test.txt` but without requiring any cookies.
+  - This endpoint allows direct downloads without authentication.
+  - Also supports Range requests for partial content downloads.
 
 Those two endpoints will log a lot of information to the console to help with debugging and testing.
 
