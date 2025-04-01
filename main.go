@@ -40,6 +40,8 @@ func setupHandler(w http.ResponseWriter, r *http.Request) {
 <body>
   <h1>Cookie Setup</h1>
   <p><a href="/">Home</a></p>
+    <p><a href="/download/test.txt">Download Test File (Requires Cookie)</a></p>
+
   <button onclick="setCookie()">Set Cookie</button>
   <button onclick="clearCookie()">Clear Cookie</button>
   <script>
