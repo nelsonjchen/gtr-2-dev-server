@@ -23,9 +23,8 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
     <li><a href="/setup.html">Cookie Setup Page</a> - Set up cookies for testing</li>
     <li><a href="/download/test.txt">Download Test File</a> - Requires valid cookie to download</li>
     <li><a href="/download-no-cookie/test.txt">Download Test File (No Cookie)</a> - Download without cookie requirement</li>
-  </ul>
     <li><a href="/download-gtr2cookie-auth/test.txt">Download Test File (Gtr2Cookie Auth)</a> - Requires 'Authorization: Gtr2Cookie testcookie=valid' header</li>
-
+	</ul>
 
   <h2>Resources:</h2>
   <ul>
