@@ -132,3 +132,119 @@ func TestDownloadHandler_RangeRequests(t *testing.T) {
 		})
 	}
 }
+
+func TestDownloadNoCookieHandler_FullDownload(t *testing.T) {
+	req := httptest.NewRequest("GET", "/download-no-cookie/test.txt", nil)
+	w := httptest.NewRecorder()
+
+	mux := setupHandlers()
+	mux.ServeHTTP(w, req)
+
+	resp := w.Result()
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("Expected status 200, got %d", resp.StatusCode)
+	}
+
+	contentLength := resp.Header.Get("Content-Length")
+	if contentLength == "" {
+		t.Error("Expected Content-Length header")
+	}
+
+	contentDisposition := resp.Header.Get("Content-Disposition")
+	if contentDisposition != "attachment; filename=test.txt" {
+		t.Errorf("Expected Content-Disposition header, got %s", contentDisposition)
+	}
+
+	body := w.Body.String()
+	if len(body) != len(testData) {
+		t.Errorf("Expected full content length %d, got %d", len(testData), len(body))
+	}
+}
+
+func TestDownloadGtr2CookieAuthHandler(t *testing.T) {
+	tests := []struct {
+		name           string
+		authHeader     string
+		rangeHeader    string
+		expectedStatus int
+		expectedBody   string // Only for error cases
+		expectedRange  string // Only for partial content
+		expectedLength int    // Only for success cases
+	}{
+		{
+			name:           "No Auth Header",
+			authHeader:     "",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "Authorization header required\n",
+		},
+		{
+			name:           "Invalid Auth Scheme",
+			authHeader:     "Bearer token",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "Invalid Authorization scheme. Expected 'Gtr2Cookie'\n",
+		},
+		{
+			name:           "Invalid Auth Data",
+			authHeader:     "Gtr2Cookie testcookie=invalid",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "Invalid Authorization data. Expected 'testcookie=valid'\n",
+		},
+		{
+			name:           "Valid Auth - Full Download",
+			authHeader:     "Gtr2Cookie testcookie=valid",
+			expectedStatus: http.StatusOK,
+			expectedLength: len(testData),
+		},
+		{
+			name:           "Valid Auth - Range Download",
+			authHeader:     "Gtr2Cookie testcookie=valid",
+			rangeHeader:    "bytes=10-19",
+			expectedStatus: http.StatusPartialContent,
+			expectedRange:  fmt.Sprintf("bytes 10-19/%d", len(testData)),
+			expectedLength: 10,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest("GET", "/download-gtr2cookie-auth/test.txt", nil)
+			if tt.authHeader != "" {
+				req.Header.Set("Authorization", tt.authHeader)
+			}
+			if tt.rangeHeader != "" {
+				req.Header.Set("Range", tt.rangeHeader)
+			}
+			w := httptest.NewRecorder()
+
+			mux := setupHandlers()
+			mux.ServeHTTP(w, req)
+
+			resp := w.Result()
+			if resp.StatusCode != tt.expectedStatus {
+				t.Errorf("Expected status %d, got %d", tt.expectedStatus, resp.StatusCode)
+			}
+
+			body := w.Body.String()
+
+			if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusPartialContent {
+				contentDisposition := resp.Header.Get("Content-Disposition")
+				if contentDisposition != "attachment; filename=test.txt" {
+					t.Errorf("Expected Content-Disposition header, got %s", contentDisposition)
+				}
+				if len(body) != tt.expectedLength {
+					t.Errorf("Expected body length %d, got %d", tt.expectedLength, len(body))
+				}
+				if tt.expectedRange != "" {
+					contentRange := resp.Header.Get("Content-Range")
+					if contentRange != tt.expectedRange {
+						t.Errorf("Expected Content-Range '%s', got '%s'", tt.expectedRange, contentRange)
+					}
+				}
+			} else {
+				if body != tt.expectedBody {
+					t.Errorf("Expected error body '%s', got '%s'", tt.expectedBody, body)
+				}
+			}
+		})
+	}
+}

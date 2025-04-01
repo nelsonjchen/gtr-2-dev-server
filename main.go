@@ -24,6 +24,8 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
     <li><a href="/download/test.txt">Download Test File</a> - Requires valid cookie to download</li>
     <li><a href="/download-no-cookie/test.txt">Download Test File (No Cookie)</a> - Download without cookie requirement</li>
   </ul>
+    <li><a href="/download-gtr2cookie-auth/test.txt">Download Test File (Gtr2Cookie Auth)</a> - Requires 'Authorization: Gtr2Cookie testcookie=valid' header</li>
+
 
   <h2>Resources:</h2>
   <ul>
@@ -152,12 +154,42 @@ func downloadNoCookieHandler(w http.ResponseWriter, r *http.Request) {
 	serveTestFile(w, r, "No-cookie endpoint")
 }
 
+func downloadGtr2CookieAuthHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Accessed /download-gtr2cookie-auth/test.txt")
+	authHeader := r.Header.Get("Authorization")
+
+	if authHeader == "" {
+		log.Println("Missing Authorization header")
+		http.Error(w, "Authorization header required", http.StatusUnauthorized)
+		return
+	}
+
+	parts := strings.SplitN(authHeader, " ", 2)
+	if len(parts) != 2 || parts[0] != "Gtr2Cookie" {
+		log.Printf("Invalid Authorization header scheme: %s", authHeader)
+		http.Error(w, "Invalid Authorization scheme. Expected 'Gtr2Cookie'", http.StatusUnauthorized)
+		return
+	}
+
+	if parts[1] != "testcookie=valid" {
+		log.Printf("Invalid Authorization header data: %s", parts[1])
+		http.Error(w, "Invalid Authorization data. Expected 'testcookie=valid'", http.StatusUnauthorized)
+		return
+	}
+
+	log.Println("Authorization successful")
+	serveTestFile(w, r, "Gtr2Cookie-protected endpoint")
+}
+
+
 func setupHandlers() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", indexHandler)
 	mux.HandleFunc("/setup.html", setupHandler)
 	mux.HandleFunc("/download/test.txt", downloadHandler)
 	mux.HandleFunc("/download-no-cookie/test.txt", downloadNoCookieHandler)
+	mux.HandleFunc("/download-gtr2cookie-auth/test.txt", downloadGtr2CookieAuthHandler)
+
 	return mux
 }
 

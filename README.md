@@ -45,6 +45,11 @@ The dev server will offer a few endpoints to develop and test functionality. It 
 - `GET /download-no-cookie/test.txt` - Returns the same test file as `/download/test.txt` but without requiring any cookies.
   - This endpoint allows direct downloads without authentication.
   - Also supports Range requests for partial content downloads.
+- `GET /download-gtr2cookie-auth/test.txt` - Returns the same test file but requires an `Authorization` header with the scheme `Gtr2Cookie` and data `testcookie=valid`.
+  - This simulates the GTR 2 mechanism where cookies are passed via Authorization headers.
+  - Returns `401 Unauthorized` if the header is missing or invalid.
+  - Also supports Range requests for partial content downloads.
+
 
 Those two endpoints will log a lot of information to the console to help with debugging and testing.
 
