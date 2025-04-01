@@ -171,9 +171,22 @@ func downloadGtr2CookieAuthHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if parts[1] != "testcookie=valid" {
-		log.Printf("Invalid Authorization header data: %s", parts[1])
-		http.Error(w, "Invalid Authorization data. Expected 'testcookie=valid'", http.StatusUnauthorized)
+	// Parse the data part like a cookie header
+	cookieData := parts[1]
+	foundCookie := false
+	pairs := strings.Split(cookieData, ";")
+	for _, pair := range pairs {
+		pair = strings.TrimSpace(pair)
+		kv := strings.SplitN(pair, "=", 2)
+		if len(kv) == 2 && kv[0] == "testcookie" && kv[1] == "valid" {
+			foundCookie = true
+			break
+		}
+	}
+
+	if !foundCookie {
+		log.Printf("Required 'testcookie=valid' not found in Authorization data: %s", cookieData)
+		http.Error(w, "Invalid Authorization data. Expected 'testcookie=valid' within data part.", http.StatusUnauthorized)
 		return
 	}
 
