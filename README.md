@@ -51,7 +51,7 @@ The dev server will offer a few endpoints to develop and test functionality. It 
   - Also supports Range requests for partial content downloads.
 
 
-Those two endpoints will log a lot of information to the console to help with debugging and testing.
+Those three endpoints will log a lot of information to the console to help with debugging and testing.
 
 ### Deployment
 
